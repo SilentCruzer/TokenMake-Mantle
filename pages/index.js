@@ -1,3 +1,4 @@
+import { NFTOptions } from '@/components/Main/NFTOptions';
 import { ethers, ethereum } from 'ethers';
 import { useState, useEffect } from 'react';
 
@@ -60,13 +61,13 @@ export default function Home() {
   return (
     <div>
       <h1>
-        Welcome to nft make
       </h1>
       {isConnected ? (
         <div>
-        <h1>Address: {defaultAccount}</h1>
+        {/* <h1>Address: {defaultAccount}</h1>
         <h3>Wallet Amount: {userBalance}</h3>
-        <h1>Chain Id: {currentChain.chainId}</h1>
+        <h1>Chain Id: {currentChain.chainId}</h1> */}
+        <NFTOptions />
       </div>
       ) : (<div>
         <button onClick={connectWalletHandler}>
