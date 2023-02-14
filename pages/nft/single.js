@@ -1,7 +1,9 @@
 import React from 'react'
 import { useState } from 'react'
+import { NFTStorage } from "nft.storage";
 
 const single = () => {
+    const client = new NFTStorage({ token: process.env.NEXT_PUBLIC_STORAGE_API });
     const [name, setName] = useState("");
     const [externalLink, setExternalLink] = useState("");
     const [fileUrl, setFileUrl] = useState();
@@ -46,12 +48,26 @@ const single = () => {
         setAttributesList([...attributesList, { trait_type: "", value: "" }]);
       };
 
+      const onSubmit = async (e) => {
+        e.preventDefault();
+
+        const cid = await client.store({
+            name: name,
+            external_link: externalLink,
+            description: description,
+            image: imageFile,
+            attributes: attributesList,
+          });
+
+          console.log(cid.url);
+      }
+
       const inputStyle =
-    "form-control bg-transparent block w-full px-3 py-1.5 text-base font-normal text-gray-200 bg-clip-padding border-2 border-solid border-neutral-700 rounded transition ease-in-out m-0 focus:text-white  focus:border-gray-400 focus:outline-none";
+    "form-control bg-transparent block w-full px-3 py-1.5 text-base font-normal text-black bg-clip-padding border-2 border-solid border-neutral-700 rounded transition ease-in-out m-0 focus:border-gray-400 focus:outline-none";
 
   return (
     <div className="px-64 py-10">
-        <form>
+        <form onSubmit={onSubmit}>
         <div className="flex">
               <div>
                 <div className="m-4">
