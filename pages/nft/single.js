@@ -1,6 +1,13 @@
-import React from 'react'
-import { useState } from 'react'
+import React,{ useState } from 'react'
 import { NFTStorage } from "nft.storage";
+import { ethers } from 'ethers';
+import { abi } from '@/constants';
+
+var provider;
+
+if (typeof window !== "undefined") {
+  provider = ((window.ethereum != null) ? new ethers.providers.Web3Provider(window.ethereum) : ethers.providers.getDefaultProvider());
+}
 
 const single = () => {
     const client = new NFTStorage({ token: process.env.NEXT_PUBLIC_STORAGE_API });
@@ -60,6 +67,11 @@ const single = () => {
           });
 
           console.log(cid.url);
+
+        const tokenContract = new ethers.Contract(process.env.NEXT_PUBLIC_CADDRESS, abi, provider);
+        const tx = await tokenContract.connect(provider.getSigner()).mint(cid.url);
+
+        console.log("NFT Minted!!!!")
       }
 
       const inputStyle =
