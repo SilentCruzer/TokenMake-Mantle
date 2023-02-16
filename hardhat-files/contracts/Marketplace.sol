@@ -13,7 +13,7 @@ contract Marketplace {
         address nftContractAddress;
         uint256 tokenId;
         address payable seller;
-        address payable owner;
+        address owner;
         uint256 price;
         bool isSold;
         bool isPresent;
