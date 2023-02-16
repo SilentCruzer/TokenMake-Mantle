@@ -31,10 +31,10 @@ contract Marketplace {
     );
 
     constructor() {
-  		itemCounter = 0;
-  		owner = payable(msg.sender);
-  		listingPrice = 0.01 ether;
-	}
+        itemCounter = 0;
+        owner = payable(msg.sender);
+        listingPrice = 0.01 ether;
+    }
 
     function listMarketItem(
         address nftContractAddress,
@@ -45,35 +45,69 @@ contract Marketplace {
         require(price > 0, "Price must be greater than 0");
 
         marketItems[itemCounter] = MarketItem(
-        itemCounter,
-        nftContractAddress,
-        tokenId,
-        payable(msg.sender),
-        address(0),
-        price,
-        false,
-        true
-    );
+            itemCounter,
+            nftContractAddress,
+            tokenId,
+            payable(msg.sender),
+            address(0),
+            price,
+            false,
+            true
+        );
 
-    IERC721(nftContractAddress).transferFrom(
-        msg.sender,
-        address(this),
-        tokenId
-    );
+        IERC721(nftContractAddress).transferFrom(
+            msg.sender,
+            address(this),
+            tokenId
+        );
 
-    payable(owner).transfer(listingPrice);
+        payable(owner).transfer(listingPrice);
 
-    emit MarketItemListed(
-        itemCounter,
-        nftContractAddress,
-        tokenId,
-        msg.sender,
-        address(0),
-        price
-    );
+        emit MarketItemListed(
+            itemCounter,
+            nftContractAddress,
+            tokenId,
+            msg.sender,
+            address(0),
+            price
+        );
 
-    itemCounter += 1;
+        itemCounter += 1;
     }
 
+    function buyMarketItem(uint256 itemId) public payable {
+        require(marketItems[itemId].isPresent, "Item is not present");
+        require(marketItems[itemId].isSold == false, "Item is already sold");
+        require(
+            marketItems[itemId].price == msg.value,
+            "Must pay the correct price"
+        );
 
+        marketItems[itemId].isSold = true;
+        marketItems[itemId].owner = payable(msg.sender);
+
+        IERC721(marketItems[itemId].nftContractAddress).transferFrom(
+            address(this),
+            msg.sender,
+            marketItems[itemId].tokenId
+        );
+    }
+
+    function getMarketItem(
+        uint256 itemId
+    ) public view returns (MarketItem memory items) {
+        items = marketItems[itemId];
+    }
+
+    function changeListingPrice(uint256 newPrice) public {
+        require(newPrice > 0, "Listing Price must be greater than 0");
+        require(
+            msg.sender == owner,
+            "Only the owner can change the listing price"
+        );
+
+        listingPrice = newPrice;
+    }
+
+    
 }
