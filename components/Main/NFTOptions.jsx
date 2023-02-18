@@ -6,7 +6,7 @@ export const NFTOptions = () => {
   return (
     <div className="grid grid-cols-2 place-items-center h-screen">
         <div className="hover:cursor-pointer" onClick={() => router.push("/nft/single")}>Launch a single NFT</div>
-    <div className="hover:cursor-pointer" onClick={() => router.push("/nft/collection")}>Launch NFT collection</div>
+    <div className="hover:cursor-pointer" onClick={() => router.push("/nft/profile")}>Launch NFT collection</div>
     </div>
   )
 }

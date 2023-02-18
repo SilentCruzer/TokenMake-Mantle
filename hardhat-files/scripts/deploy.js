@@ -1,8 +1,8 @@
 const hre = require("hardhat");
-// NFT contract deployed to:  0x2418F98136f4C62aCBA9837e38056e85a30a5Ee6
+// NFT contract deployed to:  0x3De3F669025d5abC59769d69C45883B27aC6752e
 async function main() {
   const NFT = await hre.ethers.getContractFactory("NFT");
-  const nft = await NFT.deploy("NFT Contract", "NFTST");
+  const nft = await NFT.deploy("Mantle Powered NFT", "MPN");
 
   await nft.deployed();
   console.log("NFT contract deployed to: ", nft.address);

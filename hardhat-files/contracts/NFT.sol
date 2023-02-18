@@ -7,6 +7,8 @@ contract NFT is ERC721 {
 
     uint256 public tokenCounter;
 
+    mapping(address => uint256[]) public tokenHolders;
+
     mapping (uint256 => string) private _tokenURIs;
 
     constructor(string memory name, string memory symbol) ERC721(name, symbol){
@@ -24,6 +26,11 @@ contract NFT is ERC721 {
         require(_exists(_tokenId), "ERC721Metadata: URI set of nonexistent token");
 
         _tokenURIs[_tokenId] = _tokenURI;
+        tokenHolders[msg.sender].push(_tokenId);
+    }
+
+    function getUserTokenId(address user) public view returns(uint256[] memory){
+        return tokenHolders[user];
     }
 
 
