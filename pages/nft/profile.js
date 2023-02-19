@@ -1,4 +1,4 @@
-import React, {useEffect} from 'react'
+import React, {useEffect, useState, useRef} from 'react'
 import { ethers } from 'ethers';
 import { abi } from '@/constants';
 
@@ -10,19 +10,49 @@ if (typeof window !== "undefined") {
 
 
 const Profile = () => {
+
+  const [tokenURI, setTokenURI] = useState(new Set());
+  const [tokenData, setTokenData] = useState([{}]);
+  const dataFetchedRef = useRef(false);
   useEffect(() => {
 
+    if (dataFetchedRef.current) return;
+    dataFetchedRef.current = true;
     async function getUserTokens() {
       const tokenContract = new ethers.Contract(process.env.NEXT_PUBLIC_CADDRESS, abi, provider);
-      const data = await tokenContract.getUserTokenId(ethers.utils.getAddress("0xf4dC1e5fa9Ce1103d6BC206f86f881CFa12E2fFA"));
-      console.log(data)
+      const signer = provider.getSigner();
+      const data = await tokenContract.getUserTokenId(signer.getAddress());
+
+      await Promise.all(data.map(async (item) => {
+        const uri = await tokenContract.tokenURI(item["_hex"]);
+        setTokenURI(oldItems => new Set([...oldItems, uri]));
+
+
+        const response = await fetch(uri.replace("ipfs://", "https://ipfs.io/ipfs/"));
+        const responseData = await response.json();
+
+        setTokenData(old => [...old, responseData])
+
+      }));
     }
 
     getUserTokens();
-    
+    console.log(tokenData)
   }, []);
   return (
-    <div>Profile</div>
+    <div>Profile
+      <div>
+        {tokenData?.map((item) => {
+          return <div>
+            <div>{item.name}</div>
+            <div>{item.description}</div>
+            <div>{item.image}</div>
+            <div>{item.external_link}</div>
+            <br />
+            </div>
+        })}
+      </div>
+    </div>
   )
 }
 
