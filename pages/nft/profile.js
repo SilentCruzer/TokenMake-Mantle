@@ -1,6 +1,6 @@
 import React, {useEffect, useState, useRef} from 'react'
 import { ethers } from 'ethers';
-import { abi } from '@/constants';
+import { abi, marketAbi } from '@/constants';
 
 var provider;
 
@@ -31,6 +31,8 @@ const Profile = () => {
         const response = await fetch(uri.replace("ipfs://", "https://ipfs.io/ipfs/"));
         const responseData = await response.json();
 
+        responseData["id"] = item["_hex"];
+
         setTokenData(old => [...old, responseData])
 
       }));
@@ -39,16 +41,30 @@ const Profile = () => {
     getUserTokens();
     console.log(tokenData)
   }, []);
+
+
+  async function listNft(id) {
+    const tokenContract = new ethers.Contract(process.env.NEXT_PUBLIC_CADDRESS, abi, provider);
+    const signer = provider.getSigner();
+    await tokenContract.connect(signer).approve(process.env.NEXT_PUBLIC_MADDRESS, id);
+    const marketContract = new ethers.Contract(process.env.NEXT_PUBLIC_MADDRESS, marketAbi, provider);
+    
+    const listToken = await marketContract.connect(signer).listMarketItem(process.env.NEXT_PUBLIC_CADDRESS,id,ethers.utils.parseEther("0.1"),{
+      value: ethers.utils.parseEther("0.01"),
+    });
+
+  }
   return (
     <div>Profile
       <div>
         {tokenData?.map((item) => {
           return <div>
-            <div>{item.name}</div>
+            {(item.name !== undefined)? (<div><div>{item.name}</div>
             <div>{item.description}</div>
             <div>{item.image}</div>
             <div>{item.external_link}</div>
-            <br />
+            <button onClick={() => listNft(item.id)}>Sell</button>
+            <br /><br /></div>) : (<div></div>)}
             </div>
         })}
       </div>
