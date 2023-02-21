@@ -39,5 +39,15 @@ contract NFT is ERC721 {
 
         return _tokenURIs[_tokenId];
     }
+
+    function setNewOwner(address oldOwner, address newOwner,uint256 _tokenID) external {
+        for(uint i=0;i<tokenHolders[oldOwner].length;i++){
+            if(tokenHolders[oldOwner][i] == _tokenID){
+                delete tokenHolders[oldOwner][i];
+            }
+
+            tokenHolders[newOwner].push(_tokenID);
+        }
+    }
 }
 

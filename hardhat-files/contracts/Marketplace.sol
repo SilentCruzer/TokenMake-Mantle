@@ -3,6 +3,10 @@ pragma solidity ^0.8.9;
 
 import "@openzeppelin/contracts/token/ERC721/IERC721.sol";
 
+interface INFT{
+    function setNewOwner(address oldOwner, address newOwner,uint256 _tokenID) external;
+}
+
 contract Marketplace {
     uint256 public itemCounter;
     address payable owner;
@@ -75,7 +79,7 @@ contract Marketplace {
         itemCounter += 1;
     }
 
-    function buyMarketItem(uint256 itemId) public payable {
+    function buyMarketItem(address nftAddress,uint256 itemId) public payable {
         require(marketItems[itemId].isPresent, "Item is not present");
         require(marketItems[itemId].isSold == false, "Item is already sold");
         require(
@@ -83,8 +87,12 @@ contract Marketplace {
             "Must pay the correct price"
         );
 
+        INFT(nftAddress).setNewOwner(msg.sender,marketItems[itemId].owner,marketItems[itemId].tokenId);
+
         marketItems[itemId].isSold = true;
         marketItems[itemId].owner = payable(msg.sender);
+
+
 
         IERC721(marketItems[itemId].nftContractAddress).transferFrom(
             address(this),
